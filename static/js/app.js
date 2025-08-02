@@ -8,7 +8,27 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeStudyTimer();
     initializeAvatarSelection();
     initializeMostUsedApp();
+    initializeAffirmationDashboard();
 });
+
+// Positive affirmations array
+const AFFIRMATIONS = [
+    "You are capable of amazing things!",
+    "Every small step counts toward your wellness journey.",
+    "Your mind is powerful and resilient.",
+    "Taking breaks is a sign of wisdom, not weakness.",
+    "You deserve to prioritize your mental health.",
+    "Progress, not perfection, is the goal.",
+    "You have the strength to overcome any challenge.",
+    "Mindful moments create lasting positive change.",
+    "Your well-being matters more than productivity.",
+    "Each deep breath brings you closer to calm.",
+    "You are growing stronger with every healthy choice.",
+    "Rest is not laziness; it's self-care.",
+    "Your future self will thank you for these wellness habits.",
+    "Balance is not perfection; it's intentional living.",
+    "You have everything within you to succeed."
+];
 
 // Wellness Tasks Functionality
 function initializeWellnessTasks() {
@@ -470,3 +490,49 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Affirmation Dashboard Functionality
+function initializeAffirmationDashboard() {
+    const refreshBtn = document.getElementById('refresh-affirmation');
+    const affirmationText = document.getElementById('affirmation-text');
+    
+    if (refreshBtn && affirmationText) {
+        // Set initial random affirmation
+        showRandomAffirmation();
+        
+        // Add click handler for refresh button
+        refreshBtn.addEventListener('click', () => {
+            showRandomAffirmation();
+            
+            // Add rotation animation to button
+            refreshBtn.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                refreshBtn.style.transform = '';
+            }, 300);
+        });
+        
+        // Auto-refresh affirmation every 5 minutes
+        setInterval(showRandomAffirmation, 300000);
+    }
+}
+
+function showRandomAffirmation() {
+    const affirmationText = document.getElementById('affirmation-text');
+    if (!affirmationText) return;
+    
+    // Get random affirmation (avoid repeating the same one)
+    const currentText = affirmationText.textContent;
+    let newAffirmation;
+    
+    do {
+        newAffirmation = AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)];
+    } while (newAffirmation === currentText && AFFIRMATIONS.length > 1);
+    
+    // Animate text change
+    affirmationText.style.animation = 'affirmationChange 0.5s ease-in-out';
+    
+    setTimeout(() => {
+        affirmationText.textContent = newAffirmation;
+        affirmationText.style.animation = '';
+    }, 250);
+}
