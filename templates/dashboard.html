@@ -31,7 +31,10 @@
                         {% for task in wellness_tasks %}
                         <div class="wellness-task" data-task-id="{{ task.id }}">
                             <div class="task-info">
-                                <h5>{{ task.name }}</h5>
+                                <h5>
+                                    {% if task.id == 1 %}📚{% elif task.id == 2 %}🧘{% elif task.id == 3 %}🚶{% elif task.id == 4 %}💧{% else %}🌬️{% endif %}
+                                    {{ task.name }}
+                                </h5>
                                 <p>{{ task.description }}</p>
                             </div>
                             <div class="task-controls">
@@ -84,7 +87,18 @@
                     </div>
                     <div class="avatar-display">
                         <div class="current-avatar">
-                            <div class="avatar-pixel-large avatar-{{ current_avatar.id }} animated"></div>
+                            <div class="avatar-pixel-large avatar-{{ current_avatar.id }} animated">
+                                {% if current_avatar.id == 1 %}🦊
+                                {% elif current_avatar.id == 2 %}🐢
+                                {% elif current_avatar.id == 3 %}🐻‍❄️
+                                {% elif current_avatar.id == 4 %}🦦
+                                {% elif current_avatar.id == 5 %}🦉
+                                {% elif current_avatar.id == 6 %}🐰
+                                {% elif current_avatar.id == 7 %}🐋
+                                {% elif current_avatar.id == 8 %}🦅
+                                {% elif current_avatar.id == 9 %}🦋
+                                {% else %}🐉{% endif %}
+                            </div>
                             <h4>{{ current_avatar.name }}</h4>
                         </div>
                         
@@ -95,11 +109,22 @@
                                 {% for avatar in avatars %}
                                 <div class="avatar-unlock-box" data-avatar-id="{{ avatar.id }}">
                                     {% if avatar.id in user.unlocked_avatars %}
-                                    <div class="avatar-pixel-small avatar-{{ avatar.id }} unlocked" title="{{ avatar.name }}"></div>
+                                    <div class="avatar-pixel-small avatar-{{ avatar.id }} unlocked" title="{{ avatar.name }}">
+                                        {% if avatar.id == 1 %}🦊
+                                        {% elif avatar.id == 2 %}🐢
+                                        {% elif avatar.id == 3 %}🐻‍❄️
+                                        {% elif avatar.id == 4 %}🦦
+                                        {% elif avatar.id == 5 %}🦉
+                                        {% elif avatar.id == 6 %}🐰
+                                        {% elif avatar.id == 7 %}🐋
+                                        {% elif avatar.id == 8 %}🦅
+                                        {% elif avatar.id == 9 %}🦋
+                                        {% else %}🐉{% endif %}
+                                    </div>
                                     {% else %}
                                     <div class="avatar-locked">
                                         <span class="lock-icon">🔒</span>
-                                        <span class="unlock-requirement">{{ avatar.points_required }} PTS</span>
+                                        <span class="unlock-requirement">{{ (avatar.id - 3) * 50 }} PTS</span>
                                     </div>
                                     {% endif %}
                                 </div>

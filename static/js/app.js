@@ -126,6 +126,12 @@ function completeWellnessTask(taskId, taskElement, duration) {
             const completionText = completedElement.querySelector('.completion-text');
             completionText.textContent = `✅ COMPLETED! +${data.points_earned} PTS`;
             
+            // Visual feedback for completion
+            taskElement.style.animation = 'taskComplete 1.5s ease-in-out';
+            setTimeout(() => {
+                taskElement.style.animation = '';
+            }, 1500);
+            
             // Check for avatar unlock
             checkAvatarUnlock(data.points);
             
@@ -425,10 +431,10 @@ function checkAvatarUnlock(currentPoints) {
             showMessage(`🎉 New Avatar Unlocked!`, 'success');
             
             // Add unlock animation
-            avatarBox.style.animation = 'bounce 1s ease-in-out';
+            avatarBox.style.animation = 'unlockShake 0.5s ease-in-out 3';
             setTimeout(() => {
                 avatarBox.style.animation = '';
-            }, 1000);
+            }, 1500);
         }
     }
 }
