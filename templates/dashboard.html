@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wellness Dashboard - {{ user.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <div class="container-fluid p-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dashboard-header">
+                    <h1 class="pixel-title">🌿 {{ user.name }}'s WELLNESS QUEST 🌿</h1>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Left Column: Wellness Tasks & Study Timer -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <!-- Wellness Tasks -->
+                <div class="pixel-widget mb-4">
+                    <div class="widget-header">
+                        <h3>🎯 WELLNESS QUESTS</h3>
+                    </div>
+                    <div class="widget-content">
+                        {% for task in wellness_tasks %}
+                        <div class="wellness-task" data-task-id="{{ task.id }}">
+                            <div class="task-info">
+                                <h5>{{ task.name }}</h5>
+                                <p>{{ task.description }}</p>
+                            </div>
+                            <div class="task-controls">
+                                <input type="number" class="pixel-input-small timer-input" placeholder="min" min="1" max="120" value="5">
+                                <button class="pixel-button pixel-button-small start-task-btn">START</button>
+                                <div class="task-timer hidden">
+                                    <span class="timer-display">00:00</span>
+                                    <button class="pixel-button pixel-button-small stop-task-btn">STOP</button>
+                                </div>
+                                <div class="task-completed hidden">
+                                    <span class="completion-text">✅ COMPLETED! +5 PTS</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Study Timer -->
+                <div class="pixel-widget">
+                    <div class="widget-header">
+                        <h3>📚 STUDY FOCUS</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="study-timer">
+                            <div class="study-controls">
+                                <input type="number" id="study-duration" class="pixel-input-small" placeholder="min" min="1" max="240" value="25">
+                                <button id="start-study-btn" class="pixel-button pixel-button-small">START</button>
+                            </div>
+                            <div id="study-timer-display" class="study-timer-display hidden">
+                                <div class="timer-text">
+                                    <span id="study-timer-text">00:00</span>
+                                </div>
+                                <button id="stop-study-btn" class="pixel-button pixel-button-danger">STOP (-5 PTS)</button>
+                            </div>
+                            <div id="study-completed" class="study-completed hidden">
+                                <span class="completion-text">🎓 STUDY COMPLETE! +10 PTS</span>
+                                <button id="reset-study-btn" class="pixel-button pixel-button-small">NEW SESSION</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Center Column: Avatar Display -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="pixel-widget avatar-widget">
+                    <div class="widget-header">
+                        <h3>🐾 YOUR COMPANION</h3>
+                    </div>
+                    <div class="avatar-display">
+                        <div class="current-avatar">
+                            <div class="avatar-pixel-large avatar-{{ current_avatar.id }} animated"></div>
+                            <h4>{{ current_avatar.name }}</h4>
+                        </div>
+                        
+                        <!-- Avatar Collection -->
+                        <div class="avatar-collection">
+                            <h5>COLLECTION:</h5>
+                            <div class="avatar-grid-small">
+                                {% for avatar in avatars %}
+                                <div class="avatar-unlock-box" data-avatar-id="{{ avatar.id }}">
+                                    {% if avatar.id in user.unlocked_avatars %}
+                                    <div class="avatar-pixel-small avatar-{{ avatar.id }} unlocked" title="{{ avatar.name }}"></div>
+                                    {% else %}
+                                    <div class="avatar-locked">
+                                        <span class="lock-icon">🔒</span>
+                                        <span class="unlock-requirement">{{ avatar.points_required }} PTS</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Points & Stats -->
+            <div class="col-lg-4 col-md-12 mb-4">
+                <!-- Points Dashboard -->
+                <div class="pixel-widget mb-4">
+                    <div class="widget-header">
+                        <h3>💎 WELLNESS POINTS</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="points-display">
+                            <div class="current-points">
+                                <span id="points-value">{{ user.points }}</span>
+                                <span class="points-label">POINTS</span>
+                            </div>
+                            <div class="points-breakdown">
+                                <div class="point-source">Tasks: +5 each</div>
+                                <div class="point-source">Study: +10 each</div>
+                                <div class="point-source">App Bonus: +20</div>
+                                <div class="point-penalty">Early Stop: -5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Screen Time Stats -->
+                <div class="pixel-widget">
+                    <div class="widget-header">
+                        <h3>📱 DIGITAL STATS</h3>
+                    </div>
+                    <div class="widget-content">
+                        <div class="stat-item">
+                            <label>Daily Screen Time:</label>
+                            <span class="stat-value">{{ user.screen_time }} hours</span>
+                        </div>
+                        <div class="stat-item">
+                            <label>Most Used App:</label>
+                            <div class="most-used-app">
+                                <input type="text" id="most-used-app" class="pixel-input-small" 
+                                       placeholder="Enter app name" value="{{ user.most_used_app }}">
+                                <button id="update-app-btn" class="pixel-button pixel-button-small">UPDATE</button>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <label>Study Sessions:</label>
+                            <span class="stat-value">{{ user.study_sessions }}</span>
+                        </div>
+                        <div class="wellness-tip">
+                            <p>💡 Try reducing screen time by 15min daily!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
