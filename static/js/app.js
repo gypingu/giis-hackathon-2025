@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeAvatarSelection();
     initializeMostUsedApp();
     initializeAffirmationDashboard();
+    initializeMainAffirmationDashboard();
+    initializeCatCompanion();
 });
 
 // Positive affirmations array
@@ -28,6 +30,39 @@ const AFFIRMATIONS = [
     "Your future self will thank you for these wellness habits.",
     "Balance is not perfection; it's intentional living.",
     "You have everything within you to succeed."
+];
+
+// Main affirmation arrays for the new dashboards
+const MAIN_AFFIRMATIONS = [
+    "You are capable of amazing things!",
+    "Your potential is limitless!",
+    "Every small step counts!",
+    "You're stronger than you think!",
+    "Progress, not perfection!",
+    "You've got this, champion!",
+    "Believe in your journey!",
+    "You're exactly where you need to be!",
+    "Your wellness matters!",
+    "You're doing better than you think!",
+    "Self-care is not selfish!",
+    "You're worth the effort!"
+];
+
+const CAT_MESSAGES = [
+    "touch some grass",
+    "you got this, probably",
+    "you're doing your best, maybe",
+    "meow means yes in cat",
+    "have you tried napping?",
+    "hydrate or diedrate",
+    "stretch like a cat",
+    "purr your way to success",
+    "nine lives, infinite chances",
+    "be curious, be brave",
+    "catnaps are productivity",
+    "paws for a moment",
+    "you're purrfect as you are",
+    "whiskers of wisdom say: breathe"
 ];
 
 // Wellness Tasks Functionality
@@ -541,4 +576,108 @@ function showRandomAffirmation() {
         affirmationText.textContent = newAffirmation;
         affirmationText.style.animation = '';
     }, 250);
+}
+
+// Main Affirmation Dashboard Functionality
+function initializeMainAffirmationDashboard() {
+    const refreshBtn = document.getElementById('refresh-main-affirmation');
+    const affirmationText = document.getElementById('main-affirmation-text');
+    
+    if (refreshBtn && affirmationText) {
+        // Set initial random affirmation
+        showRandomMainAffirmation();
+        
+        // Add click handler for refresh button
+        refreshBtn.addEventListener('click', () => {
+            showRandomMainAffirmation();
+            
+            // Add rotation animation to button
+            refreshBtn.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                refreshBtn.style.transform = '';
+            }, 300);
+        });
+    }
+}
+
+function showRandomMainAffirmation() {
+    const affirmationText = document.getElementById('main-affirmation-text');
+    if (!affirmationText) return;
+    
+    // Get random affirmation (avoid repeating the same one)
+    const currentText = affirmationText.textContent;
+    let newAffirmation;
+    
+    do {
+        newAffirmation = MAIN_AFFIRMATIONS[Math.floor(Math.random() * MAIN_AFFIRMATIONS.length)];
+    } while (newAffirmation === currentText && MAIN_AFFIRMATIONS.length > 1);
+    
+    // Animate text change
+    affirmationText.style.animation = 'affirmationGlow 0.5s ease-in-out';
+    
+    setTimeout(() => {
+        affirmationText.textContent = newAffirmation;
+        affirmationText.style.animation = 'affirmationGlow 3s ease-in-out infinite alternate';
+    }, 250);
+}
+
+// Cat Companion Dashboard Functionality
+function initializeCatCompanion() {
+    const refreshBtn = document.getElementById('refresh-cat-message');
+    const catMessage = document.getElementById('cat-message');
+    const pixelCat = document.getElementById('pixel-cat');
+    
+    if (refreshBtn && catMessage) {
+        // Set initial random message
+        showRandomCatMessage();
+        
+        // Add click handler for refresh button
+        refreshBtn.addEventListener('click', () => {
+            showRandomCatMessage();
+            triggerCatAnimation();
+        });
+        
+        // Add click handler for cat itself
+        if (pixelCat) {
+            pixelCat.addEventListener('click', () => {
+                showRandomCatMessage();
+                triggerCatAnimation();
+            });
+        }
+        
+        // Auto-refresh cat message every 2 minutes
+        setInterval(showRandomCatMessage, 120000);
+    }
+}
+
+function showRandomCatMessage() {
+    const catMessage = document.getElementById('cat-message');
+    if (!catMessage) return;
+    
+    // Get random message (avoid repeating the same one)
+    const currentText = catMessage.textContent;
+    let newMessage;
+    
+    do {
+        newMessage = CAT_MESSAGES[Math.floor(Math.random() * CAT_MESSAGES.length)];
+    } while (newMessage === currentText && CAT_MESSAGES.length > 1);
+    
+    // Animate text change
+    catMessage.style.animation = 'messageFloat 0.3s ease-in-out';
+    
+    setTimeout(() => {
+        catMessage.textContent = newMessage;
+        catMessage.style.animation = 'messageFloat 2s ease-in-out infinite alternate';
+    }, 150);
+}
+
+function triggerCatAnimation() {
+    const pixelCat = document.getElementById('pixel-cat');
+    if (pixelCat) {
+        // Trigger blink animation
+        pixelCat.style.animation = 'catBlink 0.5s ease-in-out, catIdle 4s ease-in-out infinite';
+        setTimeout(() => {
+            pixelCat.style.animation = 'catIdle 4s ease-in-out infinite';
+        }, 500);
+    }
 }
