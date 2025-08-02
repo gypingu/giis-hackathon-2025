@@ -43,14 +43,15 @@ def register():
     # Store user data in session
     session['user'] = {
         'name': name,
-        'age': int(age),
-        'screen_time': float(screen_time),
-        'avatar_id': int(avatar_id),
+        'age': int(age or 18),
+        'screen_time': float(screen_time or 0),
+        'avatar_id': int(avatar_id or 1),
         'points': 0,
         'unlocked_avatars': [1, 2, 3],  # First 3 avatars are free
         'most_used_app': '',
         'task_completions': {},
-        'study_sessions': 0
+        'study_sessions': 0,
+        'total_wellness_time': 0  # Track total time spent on wellness tasks
     }
     
     return redirect(url_for('dashboard'))
@@ -62,12 +63,18 @@ def dashboard():
     
     user = session['user']
     
-    # Update unlocked avatars based on points
+    # Ensure total_wellness_time exists for backward compatibility
+    if 'total_wellness_time' not in user:
+        user['total_wellness_time'] = 0
+    
+    # Update unlocked avatars based on points (every 50 points unlocks a new avatar)
     points = user.get('points', 0)
     unlocked = [1, 2, 3]  # Always unlocked
-    for avatar in AVATARS[3:]:  # Check locked avatars
-        if points >= avatar['points_required']:
-            unlocked.append(avatar['id'])
+    # Calculate how many avatars should be unlocked (every 50 points)
+    avatars_to_unlock = min(points // 50, 7)  # Maximum 7 additional avatars
+    for i in range(avatars_to_unlock):
+        if i + 4 <= 10:  # Avatar IDs 4-10
+            unlocked.append(i + 4)
     
     user['unlocked_avatars'] = unlocked
     session['user'] = user
@@ -86,11 +93,14 @@ def complete_task():
     if 'user' not in session:
         return jsonify({'error': 'Not logged in'}), 401
     
-    task_id = request.json.get('task_id')
-    duration = request.json.get('duration', 0)
+    task_id = request.json.get('task_id') or 1
+    duration = request.json.get('duration') or 0
     
     user = session['user']
-    user['points'] += 5
+    # New point system: 2 points per minute
+    points_earned = duration * 2
+    user['points'] += points_earned
+    user['total_wellness_time'] += duration
     
     # Track task completion
     task_key = f"task_{task_id}"
@@ -100,14 +110,19 @@ def complete_task():
     
     session['user'] = user
     
-    return jsonify({'success': True, 'points': user['points']})
+    return jsonify({
+        'success': True, 
+        'points': user['points'],
+        'points_earned': points_earned,
+        'total_wellness_time': user['total_wellness_time']
+    })
 
 @app.route('/complete_study', methods=['POST'])
 def complete_study():
     if 'user' not in session:
         return jsonify({'error': 'Not logged in'}), 401
     
-    duration = request.json.get('duration', 0)
+    duration = request.json.get('duration') or 0
     
     user = session['user']
     user['points'] += 10
@@ -135,7 +150,7 @@ def update_most_used_app():
     if 'user' not in session:
         return jsonify({'error': 'Not logged in'}), 401
     
-    app_name = request.json.get('app_name', '')
+    app_name = request.json.get('app_name') or ''
     
     user = session['user']
     user['most_used_app'] = app_name
@@ -153,7 +168,7 @@ def change_avatar():
     if 'user' not in session:
         return jsonify({'error': 'Not logged in'}), 401
     
-    avatar_id = request.json.get('avatar_id')
+    avatar_id = request.json.get('avatar_id') or 1
     
     user = session['user']
     

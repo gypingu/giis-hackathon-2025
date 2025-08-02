@@ -10,11 +10,32 @@ body {
     font-family: 'Press Start 2P', cursive;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #0f2027 0%, #203a43 25%, #2c5364 50%, #1e3c72 75%, #2a5298 100%);
+    background: 
+        /* Pixelated garden pattern */
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 2px,
+            rgba(34, 197, 94, 0.1) 2px,
+            rgba(34, 197, 94, 0.1) 4px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 2px,
+            rgba(34, 197, 94, 0.1) 2px,
+            rgba(34, 197, 94, 0.1) 4px
+        ),
+        /* Layered garden background */
+        radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.2) 0%, transparent 25%),
+        radial-gradient(circle at 40% 60%, rgba(59, 130, 246, 0.1) 0%, transparent 30%),
+        linear-gradient(135deg, #0f2027 0%, #1a4e3e 25%, #155e75 50%, #0f766e 75%, #059669 100%);
     color: #e0f2e7;
     min-height: 100vh;
     font-size: 12px;
     line-height: 1.6;
+    background-attachment: fixed;
 }
 
 .login-body {
@@ -376,14 +397,25 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(90deg); }
+    50% { transform: translateY(-15px) rotate(180deg); }
+    75% { transform: translateY(-10px) rotate(270deg); }
 }
 
 @keyframes bounce {
     0%, 20%, 60%, 100% { transform: translateY(0); }
     40% { transform: translateY(-20px); }
     80% { transform: translateY(-10px); }
+}
+
+@keyframes rotate360 {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.avatar-pixel-large.animated {
+    animation: float 6s ease-in-out infinite;
 }
 
 .current-avatar h4 {
@@ -485,6 +517,14 @@ body {
 
 .point-penalty {
     color: #fca5a5;
+}
+
+.unlock-info {
+    color: #fbbf24;
+    font-weight: bold;
+    border-top: 1px solid #4ade80;
+    padding-top: 5px;
+    margin-top: 5px;
 }
 
 /* Stats */

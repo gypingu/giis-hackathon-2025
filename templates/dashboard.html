@@ -124,10 +124,11 @@
                                 <span class="points-label">POINTS</span>
                             </div>
                             <div class="points-breakdown">
-                                <div class="point-source">Tasks: +5 each</div>
+                                <div class="point-source">Tasks: +2 per min</div>
                                 <div class="point-source">Study: +10 each</div>
                                 <div class="point-source">App Bonus: +20</div>
                                 <div class="point-penalty">Early Stop: -5</div>
+                                <div class="unlock-info">50 pts = New Avatar</div>
                             </div>
                         </div>
                     </div>
@@ -154,6 +155,10 @@
                         <div class="stat-item">
                             <label>Study Sessions:</label>
                             <span class="stat-value">{{ user.study_sessions }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <label>Total Wellness Time:</label>
+                            <span class="stat-value">{{ user.get('total_wellness_time', 0) }} min</span>
                         </div>
                         <div class="wellness-tip">
                             <p>💡 Try reducing screen time by 15min daily!</p>

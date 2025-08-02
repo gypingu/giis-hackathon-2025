@@ -44,6 +44,9 @@ function startWellnessTask(taskId, duration, taskElement) {
     let timeLeft = duration * 60; // Convert to seconds
     const timerDisplay = taskElement.querySelector('.timer-display');
     
+    // Store original duration for point calculation
+    taskElement.dataset.originalDuration = duration;
+    
     // Update display immediately
     updateTimerDisplay(timerDisplay, timeLeft);
     
@@ -54,7 +57,7 @@ function startWellnessTask(taskId, duration, taskElement) {
         
         if (timeLeft <= 0) {
             clearInterval(timerId);
-            completeWellnessTask(taskId, taskElement);
+            completeWellnessTask(taskId, taskElement, duration);
         }
     }, 1000);
     
@@ -70,16 +73,17 @@ function stopWellnessTask(taskId, taskElement) {
     resetWellnessTaskDisplay(taskElement);
 }
 
-function completeWellnessTask(taskId, taskElement) {
+function completeWellnessTask(taskId, taskElement, duration) {
     if (activeTimers.has(taskId)) {
         clearInterval(activeTimers.get(taskId));
         activeTimers.delete(taskId);
     }
     
-    // Show completion message
+    // Show completion message with points earned
     const controls = taskElement.querySelector('.task-controls');
     controls.querySelector('.task-timer').classList.add('hidden');
-    controls.querySelector('.task-completed').classList.remove('hidden');
+    const completedElement = controls.querySelector('.task-completed');
+    completedElement.classList.remove('hidden');
     
     // Award points
     fetch('/complete_task', {
@@ -89,17 +93,26 @@ function completeWellnessTask(taskId, taskElement) {
         },
         body: JSON.stringify({
             task_id: parseInt(taskId),
-            duration: 0
+            duration: duration
         })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             updatePointsDisplay(data.points);
-            // Reset task after 3 seconds
+            updateWellnessTimeDisplay(data.total_wellness_time);
+            
+            // Update completion message with actual points earned
+            const completionText = completedElement.querySelector('.completion-text');
+            completionText.textContent = `✅ COMPLETED! +${data.points_earned} PTS`;
+            
+            // Check for avatar unlock
+            checkAvatarUnlock(data.points);
+            
+            // Reset task after 4 seconds
             setTimeout(() => {
                 resetWellnessTaskDisplay(taskElement);
-            }, 3000);
+            }, 4000);
         }
     })
     .catch(error => console.error('Error completing task:', error));
@@ -353,6 +366,50 @@ function updatePointsDisplay(points) {
         setTimeout(() => {
             pointsElement.style.transform = 'scale(1)';
         }, 300);
+    }
+}
+
+function updateWellnessTimeDisplay(totalTime) {
+    const timeElements = document.querySelectorAll('.stat-value');
+    timeElements.forEach(el => {
+        if (el.textContent.includes('min') && el.parentElement.querySelector('label').textContent.includes('Total Wellness Time')) {
+            el.textContent = `${totalTime} min`;
+        }
+    });
+}
+
+function checkAvatarUnlock(currentPoints) {
+    const avatarsToUnlock = Math.floor(currentPoints / 50);
+    const unlockBoxes = document.querySelectorAll('.avatar-unlock-box');
+    
+    // Check for newly unlocked avatars (avatar IDs 4-10)
+    for (let i = 4; i <= Math.min(10, 3 + avatarsToUnlock); i++) {
+        const avatarBox = document.querySelector(`[data-avatar-id="${i}"]`);
+        if (avatarBox && avatarBox.querySelector('.avatar-locked')) {
+            // Unlock this avatar
+            const lockedElement = avatarBox.querySelector('.avatar-locked');
+            lockedElement.remove();
+            
+            // Add unlocked avatar
+            const unlockedAvatar = document.createElement('div');
+            unlockedAvatar.className = `avatar-pixel-small avatar-${i} unlocked`;
+            unlockedAvatar.title = `Avatar ${i}`;
+            avatarBox.appendChild(unlockedAvatar);
+            
+            // Add click handler
+            avatarBox.addEventListener('click', () => {
+                changeAvatar(i);
+            });
+            
+            // Show unlock notification
+            showMessage(`🎉 New Avatar Unlocked!`, 'success');
+            
+            // Add unlock animation
+            avatarBox.style.animation = 'bounce 1s ease-in-out';
+            setTimeout(() => {
+                avatarBox.style.animation = '';
+            }, 1000);
+        }
     }
 }
 
